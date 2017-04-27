@@ -1,7 +1,12 @@
 /*
-Snake Game v0.0.2
+Snake Game v0.0.3
 04/25/2017
 */
+/* CHANGE LOG:
+v0.0.3
+-Added a change log (Seeing how github updates and compares files)
+*/
+
 
 #include <iostream>
 #include <vector>
