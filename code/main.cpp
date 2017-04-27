@@ -1,13 +1,10 @@
 /*
-Snake Game v0.0.5
+Snake Game v0.0.6
 04/27/2017
 */
 /* CHANGE LOG:
-v0.0.5
--Cleaned up old code
--Added empty functions that need to be created.
--Added score & highscore variable.
--Cleaned up MapTile code.
+v0.0.6
+- Added enum function to give directions a numerical value (line 81)
 */
 
 #include <iostream> 
@@ -77,13 +74,17 @@ void displayMap(){
 		std::cout << "[]";
 	}
 	std::cout << std::endl;
+	
 }
 
 //Checks for key presses and returns a number 1-4 depending on which key pressed.
-int keyChecker(){
-	// ??? 
-	//return(?);
-};
+enum keyChecker { UP, DOWN, LEFT, RIGHT} snake; // auto gives UP, DOWN, LEFT, and RIGHT the values 0-3
+		/*std::cout << keyChecker(UP) << std::endl;
+		std::cout << keyChecker(DOWN) << std::endl;
+		std::cout << keyChecker(LEFT) << std::endl;
+		std::cout << keyChecker(RIGHT) << std::endl;
+		Checked this out and it prints out 0 - 3 like it should */
+		
 
 //Generates random coordinates for a new food object. Checks to make sure it's not in a position where a head or tail piece is.
 void randomFoodGenerator(){
@@ -126,7 +127,7 @@ int main(){
 		}
 		
 		// ~~If statements for each direction.~~
-		
+	
 		// ~~If statement for wall collision.~~
 		
 		//.....
