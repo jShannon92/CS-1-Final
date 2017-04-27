@@ -1,14 +1,16 @@
 /*
-Snake Game v0.0.3
-04/25/2017
+Snake Game v0.0.5
+04/27/2017
 */
 /* CHANGE LOG:
-v0.0.3
--Added a change log (Seeing how github updates and compares files)
+v0.0.5
+-Cleaned up old code
+-Added empty functions that need to be created.
+-Added score & highscore variable.
+-Cleaned up MapTile code.
 */
 
-
-#include <iostream> // Just testing GitHub
+#include <iostream> 
 #include <vector>
 #include "Windows.h"
 #include "MapTile.h"
@@ -26,6 +28,9 @@ int headYPos = 4; //4 being a random starting position for now.
 int foodXPos = 5; //5 being a random starting position for now.
 int foodYPos = 7; //7 being a random starting position for now.
 
+int score = 0;
+int highscore = 0;
+
 //vector for tail cordinates?
 
 void displayMap(){
@@ -36,6 +41,7 @@ void displayMap(){
 	std::cout << "headYPos: " << headYPos << std::endl;
 	std::cout << "foodXPos: " << foodXPos << std::endl;
 	std::cout << "foodYPos: " << foodYPos << std::endl;
+	std::cout << "moveDirection = " << moveDirection << std::endl;
 	//Top Border
 	for(int b=0; b<tiles[0].size()+2; b++){
 		std::cout << "[]";
@@ -62,24 +68,6 @@ void displayMap(){
 				std::cout << "??"; 
 			}
 			
-			/* OLD SHIT, DUMB SHIT:
-			if(tiles[i][i2].getType() == 0){
-				//Blank Space
-				std::cout << "  ";
-			}
-			if(tiles[i][i2].getType() == 1){
-				//Food
-				std::cout << "**";
-			}
-			if(tiles[i][i2].getType() == 2){
-				//Head
-				std::cout << "OO";
-			}
-			if(tiles[i][i2].getType() == 3){
-				//Tail
-				std::cout << "~~";
-			}
-			*/
 		}
 		//Right Border
 		std::cout << "[]" << std::endl;
@@ -91,15 +79,33 @@ void displayMap(){
 	std::cout << std::endl;
 }
 
+//Checks for key presses and returns a number 1-4 depending on which key pressed.
 int keyChecker(){
 	// ??? 
 	//return(?);
 };
 
-/*
+//Generates random coordinates for a new food object. Checks to make sure it's not in a position where a head or tail piece is.
 void randomFoodGenerator(){
+	// ???
 };
-*/
+
+//Generates a random position for the snake head within the map. Avoid making it to close to the border.
+void randomHeadGenerator(){
+	// ???
+};
+
+//Generates a random direction number and sets the moveDirection variable to the new number.
+void randomDirectionGenerator(){
+	// ???
+};
+
+//Game over screen that displays the user's score and the high score. Allows for the option to replay. 
+void gameOverScreen(){
+	// ???
+};
+
+// ~~Function for logging player's previous positions / tail trail?~~
 
 int main(){
 	//Sets the size for the map.
@@ -118,6 +124,10 @@ int main(){
 			moveDirection = keyReturn; //Set the moveDirection to the key return int.
 			keyReturn = 0; //Return keyReturn to it's default state.
 		}
+		
+		// ~~If statements for each direction.~~
+		
+		// ~~If statement for wall collision.~~
 		
 		//.....
 		
