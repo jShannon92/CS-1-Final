@@ -1,15 +1,13 @@
 /*
-Snake Game v0.0.8
-04/27/2017
+Snake Game v0.1
+05/01/2017
 */
 /* CHANGE LOG:
 v0.0.8
-- Added the start screen
-- Modified the debug info shown above the map.
-- Removed some old unused code.
-- Fixed the food displaying on the wrong coordinates.
-- Added wall and food collision
-- Added score display.
+- Modified the movement system to stop 180 turns.
+- Made it be able to loop the game over and over again.
+- Made a game over screen.
+- Made a high score system.
 */
 
 #include <iostream> 
@@ -32,7 +30,10 @@ int foodXPos = 5; //5 being a random starting position for now.
 int foodYPos = 7; //7 being a random starting position for now.
 
 int score = 0;
-int highscore = 0;
+int highScore = 0;
+int mapSize = 15;
+
+int frame = 0;
 
 //vector for tail cordinates?
 
@@ -80,33 +81,35 @@ std::string centerString(std::string text, int fieldsize){
 enum direction { UP, DOWN, LEFT, RIGHT} snake;
 	direction dir;
 
-
- // auto gives UP, DOWN, LEFT, and RIGHT the values 0-3
-		/*std::cout << sdirection(UP) << std::endl;
-		std::cout << sdirection(DOWN) << std::endl;
-		std::cout << sdirection(LEFT) << std::endl;
-		std::cout << sdirection(RIGHT) << std::endl;
-		Checked this out and it prints out 0 - 3 like it should */
 void input(){ // grabs the input w a s d and gives them a direction
 	if (_kbhit())
 	{
 		switch (_getch())
 		{
 			case 'w':
+				if(dir != DOWN){
 				dir = UP;
+				}
 				break;
 			case 's':
+				if(dir != UP){
 				dir = DOWN;
+				}
 				break;
 			case 'a':
+				if(dir != RIGHT){
 				dir = LEFT;
+				}
 				break;
 			case 'd':
+				if(dir != LEFT){
 				dir = RIGHT;
+				}
 				break;
 		}
 	}
-}		
+}
+	
 void logic(){                 // HELL YEAH GOT THIS TO WORK
 	switch (dir)
 	{
@@ -128,6 +131,7 @@ void logic(){                 // HELL YEAH GOT THIS TO WORK
 
 void displayMap(){
 	system("cls");
+	
 	std::cout << "MapSize x: " << tiles.size() << std::endl;
 	std::cout << "MapSize y: " << tiles[0].size() << std::endl;
 	std::cout << "headXPos: " << headXPos << std::endl;
@@ -136,6 +140,9 @@ void displayMap(){
 	std::cout << "foodYPos: " << foodYPos << std::endl;
 	std::cout << "dir = " << dir << std::endl;
 	std::cout << "score = " << score << std::endl;
+	std::cout << "highScore = " << highScore << std::endl;
+	std::cout << "frame = " << frame << std::endl;
+	
 	//Top Border
 	for(int b=0; b<tiles[0].size()+2; b++){
 		std::cout << "[]";
@@ -144,7 +151,6 @@ void displayMap(){
 	for(int i=0; i<tiles[0].size(); i++){	
 		//Left Border	
 		std::cout << "[]";
-		
 		for(int i2=0; i2<tiles.size(); i2++){
 			if(headYPos == i && headXPos == i2){ //If the current cell being rendered is the same coordinates as the head.
 				std:: cout << " O";              //Switched the headYPos and headXPos since they were backwards and changing the X value would move it along the Y axis
@@ -253,7 +259,7 @@ void startingScreen(){
 	std::cout << centerString("By:",46+leftBorder*2) << std::endl;
 	std::cout << centerString("D'Metri Cortez",46+leftBorder*2) << std::endl;
 	std::cout << centerString("Jacob Shannon",46+leftBorder*2) << std::endl;
-		std::cout << centerString("Brittany Green",46+leftBorder*2) << std::endl;
+	std::cout << centerString("Brittany Green",46+leftBorder*2) << std::endl;
 	std::cout << std::endl << std::endl;
 	std::cout << centerString("Press [Enter] to start.",46+leftBorder*2) << std::endl;
 
@@ -274,6 +280,8 @@ void randomFoodGenerator(){
 //Generates a random position for the snake head within the map. Avoid making it to close to the border.
 void randomHeadGenerator(){
 	// ???
+	headYPos = 4;
+	headXPos = 4;
 };
 
 //Generates a random direction number and sets the moveDirection variable to the new number.
@@ -283,33 +291,66 @@ void randomDirectionGenerator(){
 
 //Game over screen that displays the user's score and the high score. Allows for the option to replay. 
 void gameOverScreen(){
-	// ???
+	system("CLS");
+	if(score > highScore){
+		highScore = score;
+	}
+	std::cout << std::endl << centerString("GAME OVER!",40) << std::endl;
+	std::cout << centerString("Current Score:",40) << std::endl;
+	std::ostringstream scoreStringStream;
+    scoreStringStream << score;
+    std::string scoreString = scoreStringStream.str();
+	std::cout << centerString(scoreString,40) << std::endl; //Display the score at the bottom of the screen.
+	std::cout << std::endl;
+	std::cout << centerString("Previous High Score:",40) << std::endl;
+	std::ostringstream highScoreStringStream;
+    highScoreStringStream << highScore;
+    std::string highScoreString = highScoreStringStream.str();
+	std::cout << centerString(highScoreString,40) << std::endl;
+	std::cout << centerString("Press [Enter] to start a new game.",40) << std::endl;
+	bool enterPress = false;
+	while(enterPress == false){
+		char key = _getch();
+		if(key == '\r'){ //If the enter key is pressed
+			enterPress = true;
+		}
+	}
+	gameOver = false;
 };
 
 // ~~Function for logging player's previous positions / tail trail?~~
 
 int main(){
 	//Sets the size for the map.
-	tiles.resize(10);
+	tiles.resize(mapSize);
 	for(int i=0; i<tiles.size(); i++){
-		tiles[i].resize(10);
+		tiles[i].resize(mapSize);
 	}
 	startingScreen();
 	//The main game loop.
-	while(gameOver == false){ //Keep looping this until the game is over / player loses.
-		displayMap();
-		input();
-		logic();
-		Sleep(140); //Pause the program for a fraction of a second to prevent the game from running too fast.
-		if(headXPos < 0 || headYPos < 0 || headYPos >= tiles[0].size() || headXPos >= tiles.size()){ //Head hit a wall.
-			gameOver = true;
+	while(true){
+		score = 0;
+		randomHeadGenerator();
+		randomDirectionGenerator();
+		randomFoodGenerator();
+		while(gameOver == false){ //Keep looping this until the game is over / player loses.
+			frame++;
+			displayMap();
+			input();
+			logic();
+			Sleep(80); //Pause the program for a fraction of a second to prevent the game from running too fast.
+			if(headXPos < 0 || headYPos < 0 || headYPos >= tiles[0].size() || headXPos >= tiles.size()){ //Head hit a wall.
+				gameOver = true;
+			}
+			if(headXPos == foodXPos && headYPos == foodYPos){ //Head hit some food. 
+				score++;
+				//randomFoodGenerator();
+			}
+			
+			// ~~If statement for tail collision.~~
+			//.....
 		}
-		if(headXPos == foodXPos && headYPos == foodYPos){ //Head hit some food. 
-			score++;
-		}
-		// ~~If statement for tail collision.~~
-		
-		//.....
+		gameOverScreen();
 		
 	}
 	
