@@ -291,6 +291,19 @@ void randomFoodGenerator(){
 	
 	foodXPos = 1+(rand() % ((tiles.size()-1)-1 + 1));
 	foodYPos = 1+(rand() % ((tiles[0].size()-1)-1 + 1));
+	
+	while (foodXPos != headXPos && foodYPos != headYPos)
+	{
+		foodXPos = 1+(rand() % ((tiles.size()-1)-1 + 1));
+		foodYPos = 1+(rand() % ((tiles[0].size()-1)-1 + 1));
+	}
+	
+		for(int i=0; i<tailCords.size(); i++){
+		if(tailCords[i][0] == foodXPos && tailCords[i][1] == foodYPos){
+			foodXPos = 1+(rand() % ((tiles.size()-1)-1 + 1));  
+		    foodYPos = 1+(rand() % ((tiles[0].size()-1)-1 + 1));
+		}
+	}
 };
 
 //Generates a random position for the snake head within the map. Avoid making it to close to the border.
