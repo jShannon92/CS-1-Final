@@ -1,11 +1,11 @@
 /*
-Snake Game v0.2
+Snake Game v0.3
 05/03/2017
 */
 /* CHANGE LOG:
-v0.2
-- Added a tail system.
-- Commented out some debug info we shouldn't need anymore.
+v0.3
+- Added Random food generator.
+- Set tile boundaries for food
 */
 
 //Before the final version: remove little stuff like tracking current frame, increasing the variable. Any stuff that's being calculated but not used, get rid of it to optimize speed.
@@ -16,6 +16,8 @@ v0.2
 #include "MapTile.h"
 #include <conio.h>
 #include <sstream> // Needed to convert int to string
+#include <cstdlib> // Needed to access the 'rand()' function
+#include <ctime> // Needed to use the computers time to simulate true randomness
 
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //Handle used for changing text ouput color.
 
@@ -285,7 +287,10 @@ void startingScreen(){
 
 //Generates random coordinates for a new food object. Checks to make sure it's not in a position where a head or tail piece is.
 void randomFoodGenerator(){
-	// ???
+	srand(time(0));
+	
+	foodXPos = 1+(rand() % ((tiles.size()-1)-1 + 1));
+	foodYPos = 1+(rand() % ((tiles[0].size()-1)-1 + 1));
 };
 
 //Generates a random position for the snake head within the map. Avoid making it to close to the border.
