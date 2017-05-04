@@ -1,14 +1,14 @@
 /*
-Snake Game v0.1
-05/01/2017
+Snake Game v0.2
+05/03/2017
 */
 /* CHANGE LOG:
-v0.0.8
-- Modified the movement system to stop 180 turns.
-- Made it be able to loop the game over and over again.
-- Made a game over screen.
-- Made a high score system.
+v0.2
+- Added a tail system.
+- Commented out some debug info we shouldn't need anymore.
 */
+
+//Before the final version: remove little stuff like tracking current frame, increasing the variable. Any stuff that's being calculated but not used, get rid of it to optimize speed.
 
 #include <iostream> 
 #include <vector>
@@ -20,6 +20,8 @@ v0.0.8
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //Handle used for changing text ouput color.
 
 std::vector< std::vector <MapTile> > tiles;
+
+std::vector< std::vector <int> > tailCords; //MultiDimensional vector for the tail cordinates. Each element in the first dimension is a tail piece which is comprised of two int elements for the X and Y position.
 
 bool gameOver = false; //Boolean that causes the main game loop to end after the game is over.
 
@@ -34,8 +36,6 @@ int highScore = 0;
 int mapSize = 15;
 
 int frame = 0;
-
-//vector for tail cordinates?
 
 /* 
 	Adds an appropriate amount of padding to the left and right of a string to make it appear centered in a column.
@@ -76,10 +76,20 @@ std::string centerString(std::string text, int fieldsize){
 	return std::string(leftpadding,' ') + text + std::string(rightpadding,' '); 
 };
 
-
 //Checks for key presses and returns a number 1-4 depending on which key pressed.
 enum direction { UP, DOWN, LEFT, RIGHT} snake;
 	direction dir;
+
+void updateTail(){ 
+	//Adds new elements to the cords showing the lastest position of the head.
+	//Higher index elements are closer to the head. [0] is the end of the tail.
+	tailCords.resize(tailCords.size()+1); //Increase the amount of elements (amount of tail pieces)
+	tailCords[tailCords.size()-1].push_back(headXPos); //Have the latest element have the lastest cordinate of the head.
+	tailCords[tailCords.size()-1].push_back(headYPos); //Have the latest element have the lastest cordinate of the head.
+	if (tailCords.size() > score+1){ //Check to see if the tail size has gotten too big.
+		tailCords.erase(tailCords.begin()); //Remove the first element. This makes it look like the end of the tail is being pulled by the body.
+	}
+};
 
 void input(){ // grabs the input w a s d and gives them a direction
 	if (_kbhit())
@@ -110,7 +120,7 @@ void input(){ // grabs the input w a s d and gives them a direction
 	}
 }
 	
-void logic(){                 // HELL YEAH GOT THIS TO WORK
+void logic(){
 	switch (dir)
 	{
 		case UP:
@@ -131,43 +141,44 @@ void logic(){                 // HELL YEAH GOT THIS TO WORK
 
 void displayMap(){
 	system("cls");
-	
-	std::cout << "MapSize x: " << tiles.size() << std::endl;
-	std::cout << "MapSize y: " << tiles[0].size() << std::endl;
+	//std::cout << "MapSize x: " << tiles.size() << std::endl;
+	//std::cout << "MapSize y: " << tiles[0].size() << std::endl;
 	std::cout << "headXPos: " << headXPos << std::endl;
 	std::cout << "headYPos: " << headYPos << std::endl;
 	std::cout << "foodXPos: " << foodXPos << std::endl;
 	std::cout << "foodYPos: " << foodYPos << std::endl;
-	std::cout << "dir = " << dir << std::endl;
-	std::cout << "score = " << score << std::endl;
-	std::cout << "highScore = " << highScore << std::endl;
-	std::cout << "frame = " << frame << std::endl;
+	//std::cout << "dir = " << dir << std::endl;
+	//std::cout << "score = " << score << std::endl;
+	//std::cout << "highScore = " << highScore << std::endl;
+	//std::cout << "frame = " << frame << std::endl;
 	
-	//Top Border
-	for(int b=0; b<tiles[0].size()+2; b++){
+	for(int b=0; b<tiles[0].size()+2; b++){ //Top Border
 		std::cout << "[]";
 	}
 	std::cout << std::endl;
-	for(int i=0; i<tiles[0].size(); i++){	
-		//Left Border	
-		std::cout << "[]";
-		for(int i2=0; i2<tiles.size(); i2++){
-			if(headYPos == i && headXPos == i2){ //If the current cell being rendered is the same coordinates as the head.
-				std:: cout << " O";              //Switched the headYPos and headXPos since they were backwards and changing the X value would move it along the Y axis
-			}else if(foodYPos == i && foodXPos == i2){ //Current cell is where the food is.
-				std::cout << " *";
-			}else if(tiles[i][i2].getMoveable() == false){ //Unmoveable space. We actually probably don't need this unless we want to make obsticales in the middle of the map.
-				std::cout << "[]";
-			}else if(tiles[i][i2].getMoveable() == true){ //Empty space.
-				std::cout << "  ";
-			/*
-			}else if(  ~~Check to see if part of the tail is here~~ ){
-				std::cout << "~~";
-			*/
-			}else{ //SOMETHING WENT WRONG!
-				std::cout << "??"; 
+	for(int i=0; i<tiles[0].size(); i++){ //Displays each row (X).
+		std::cout << "[]"; //Left Border
+		for(int i2=0; i2<tiles.size(); i2++){ //Displays each coloum piece in the row.
+			bool tailTile = false; //Boolean to indicate if the current cell is a tail piece.
+			for(int i3=0; i3<tailCords.size(); i3++){ //Go through each element of the tailCords vector.
+				if(tailCords[i3][0] == i2 && tailCords[i3][1] == i){ //If the current element has cordinates matching the current tile being displayed...
+					tailTile = true; //Set the boolean to true.
+				}
 			}
 			
+			if(headYPos == i && headXPos == i2){ //If the current cell being rendered is the same coordinates as the head.
+				std:: cout << "OO";              //Switched the headYPos and headXPos since they were backwards and changing the X value would move it along the Y axis
+			}else if(foodYPos == i && foodXPos == i2){ //Current cell is where the food is.
+				std::cout << "**";
+			}else if(tiles[i][i2].getMoveable() == false){ //Unmoveable space. We actually probably don't need this unless we want to make obsticales in the middle of the map.
+				std::cout << "[]";
+			}else if(tailTile == true){ //Current cell is where a tail should be.
+				std::cout << "$$";
+			}else if(tiles[i][i2].getMoveable() == true){ //Empty space.
+				std::cout << "  ";
+			}else{ //SOMETHING WENT WRONG!
+				std::cout << "??"; 
+			}	
 		}
 		//Right Border
 		std::cout << "[]" << std::endl;
@@ -318,23 +329,22 @@ void gameOverScreen(){
 	gameOver = false;
 };
 
-// ~~Function for logging player's previous positions / tail trail?~~
-
 int main(){
-	//Sets the size for the map.
-	tiles.resize(mapSize);
-	for(int i=0; i<tiles.size(); i++){
+	tiles.resize(mapSize); //Sets the Y size for the map.
+	for(int i=0; i<tiles.size(); i++){ //Sets the X size for the map.
 		tiles[i].resize(mapSize);
 	}
 	startingScreen();
 	//The main game loop.
 	while(true){
+		tailCords.resize(0);
 		score = 0;
 		randomHeadGenerator();
 		randomDirectionGenerator();
 		randomFoodGenerator();
 		while(gameOver == false){ //Keep looping this until the game is over / player loses.
 			frame++;
+			updateTail();
 			displayMap();
 			input();
 			logic();
@@ -344,15 +354,15 @@ int main(){
 			}
 			if(headXPos == foodXPos && headYPos == foodYPos){ //Head hit some food. 
 				score++;
-				//randomFoodGenerator();
+				randomFoodGenerator();
 			}
-			
-			// ~~If statement for tail collision.~~
-			//.....
+			for(int i=0; i<tailCords.size(); i++){ //Go though the tailCords vector
+				if(tailCords[i][0] == headXPos && tailCords[i][1] == headYPos){ //Check to see if the head position is on a the current tail position being checked.
+					gameOver = true;
+				}
+			}
 		}
 		gameOverScreen();
-		
 	}
-	
 	return 0;
 }
