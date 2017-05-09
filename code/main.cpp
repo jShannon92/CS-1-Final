@@ -1,13 +1,10 @@
 /*
-Snake Game v1.0
+Snake Game v1.1
 05/09/2017
 */
 /* CHANGE LOG:
-v1.0
-- Completed the random functions.
-- Changed the graphics.
-- Attempted to optimize the speed.
-- Removed maptile includes.
+v1.1
+- Removed uneccesary files.
 */
 
 //Before the final version: remove little stuff like tracking current frame, increasing the variable. Any stuff that's being calculated but not used, get rid of it to optimize speed.
