@@ -1,10 +1,10 @@
 /*
-Snake Game v1.1
+Snake Game v1.2
 05/09/2017
 */
 /* CHANGE LOG:
-v1.1
-- Removed uneccesary files.
+v1.2
+Added sound effect
 */
 
 //Before the final version: remove little stuff like tracking current frame, increasing the variable. Any stuff that's being calculated but not used, get rid of it to optimize speed.
@@ -282,6 +282,16 @@ void startingScreen(){
 	}
 };
 
+
+
+bool tailFoodCheck(){
+	for(int i=0; i<tailCords.size(); i++){
+		if(tailCords[i][0] == foodXPos && tailCords[i][1] == foodYPos){
+			return true;
+		}
+	}
+}
+
 //Generates random coordinates for a new food object. Checks to make sure it's not in a position where a head or tail piece is.
 void randomFoodGenerator(){
 	srand(time(0));
@@ -289,18 +299,22 @@ void randomFoodGenerator(){
 	foodXPos = 1+(rand() % ((tiles.size()-1)-1 + 1));
 	foodYPos = 1+(rand() % ((tiles[0].size()-1)-1 + 1));
 	
-	while (foodXPos != headXPos && foodYPos != headYPos)
-	{
+	while (foodXPos == headXPos && foodYPos == headYPos){
 		foodXPos = 1+(rand() % ((tiles.size()-1)-1 + 1));
 		foodYPos = 1+(rand() % ((tiles[0].size()-1)-1 + 1));
 	}
-	
-		for(int i=0; i<tailCords.size(); i++){
+	while(tailFoodCheck() == true){
+		foodXPos = 1+(rand() % ((tiles.size()-1)-1 + 1));
+		foodYPos = 1+(rand() % ((tiles[0].size()-1)-1 + 1));
+	}
+	/*
+	for(int i=0; i<tailCords.size(); i++){
 		if(tailCords[i][0] == foodXPos && tailCords[i][1] == foodYPos){
 			foodXPos = 1+(rand() % ((tiles.size()-1)-1 + 1));  
 		    foodYPos = 1+(rand() % ((tiles[0].size()-1)-1 + 1));
 		}
 	}
+	*/
 };
 
 //Generates a random position for the snake head within the map. Avoid making it to close to the border.
@@ -380,6 +394,8 @@ int main(){
 			
 			if(headXPos == foodXPos && headYPos == foodYPos){ //Head hit some food. 
 				score++;
+				Beep(900,50);
+				//std::cout << "\a"; //Windows alert sound 
 				randomFoodGenerator();
 			}else if(headXPos < 0 || headYPos < 0 || headYPos >= tiles[0].size() || headXPos >= tiles.size()){ //Head hit a wall.
 				gameOver = true;
