@@ -1,11 +1,13 @@
 /*
-Snake Game v0.3
-05/03/2017
+Snake Game v1.0
+05/09/2017
 */
 /* CHANGE LOG:
-v0.3
-- Added Random food generator.
-- Set tile boundaries for food
+v1.0
+- Completed the random functions.
+- Changed the graphics.
+- Attempted to optimize the speed.
+- Removed maptile includes.
 */
 
 //Before the final version: remove little stuff like tracking current frame, increasing the variable. Any stuff that's being calculated but not used, get rid of it to optimize speed.
@@ -13,7 +15,6 @@ v0.3
 #include <iostream> 
 #include <vector>
 #include "Windows.h"
-#include "MapTile.h"
 #include <conio.h>
 #include <sstream> // Needed to convert int to string
 #include <cstdlib> // Needed to access the 'rand()' function
@@ -21,7 +22,7 @@ v0.3
 
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //Handle used for changing text ouput color.
 
-std::vector< std::vector <MapTile> > tiles;
+std::vector< std::vector <int> > tiles;
 
 std::vector< std::vector <int> > tailCords; //MultiDimensional vector for the tail cordinates. Each element in the first dimension is a tail piece which is comprised of two int elements for the X and Y position.
 
@@ -145,21 +146,23 @@ void displayMap(){
 	system("cls");
 	//std::cout << "MapSize x: " << tiles.size() << std::endl;
 	//std::cout << "MapSize y: " << tiles[0].size() << std::endl;
-	std::cout << "headXPos: " << headXPos << std::endl;
-	std::cout << "headYPos: " << headYPos << std::endl;
-	std::cout << "foodXPos: " << foodXPos << std::endl;
-	std::cout << "foodYPos: " << foodYPos << std::endl;
+	//std::cout << "headXPos: " << headXPos << std::endl;
+	//std::cout << "headYPos: " << headYPos << std::endl;
+	//std::cout << "foodXPos: " << foodXPos << std::endl;
+	//std::cout << "foodYPos: " << foodYPos << std::endl;
 	//std::cout << "dir = " << dir << std::endl;
 	//std::cout << "score = " << score << std::endl;
 	//std::cout << "highScore = " << highScore << std::endl;
 	//std::cout << "frame = " << frame << std::endl;
 	
 	for(int b=0; b<tiles[0].size()+2; b++){ //Top Border
-		std::cout << "[]";
+		//std::cout << "[]";
+		std::cout << char(219) << char(219);
 	}
 	std::cout << std::endl;
 	for(int i=0; i<tiles[0].size(); i++){ //Displays each row (X).
-		std::cout << "[]"; //Left Border
+		//std::cout << "[]"; //Left Border
+		std::cout << char(219) << char(219);
 		for(int i2=0; i2<tiles.size(); i2++){ //Displays each coloum piece in the row.
 			bool tailTile = false; //Boolean to indicate if the current cell is a tail piece.
 			for(int i3=0; i3<tailCords.size(); i3++){ //Go through each element of the tailCords vector.
@@ -167,27 +170,25 @@ void displayMap(){
 					tailTile = true; //Set the boolean to true.
 				}
 			}
-			
 			if(headYPos == i && headXPos == i2){ //If the current cell being rendered is the same coordinates as the head.
-				std:: cout << "OO";              //Switched the headYPos and headXPos since they were backwards and changing the X value would move it along the Y axis
+				//std:: cout << "OO";
+				std::cout << char(237) << char(237);
 			}else if(foodYPos == i && foodXPos == i2){ //Current cell is where the food is.
-				std::cout << "**";
-			}else if(tiles[i][i2].getMoveable() == false){ //Unmoveable space. We actually probably don't need this unless we want to make obsticales in the middle of the map.
-				std::cout << "[]";
+				std::cout << char(235) << char(235);
 			}else if(tailTile == true){ //Current cell is where a tail should be.
-				std::cout << "$$";
-			}else if(tiles[i][i2].getMoveable() == true){ //Empty space.
-				std::cout << "  ";
-			}else{ //SOMETHING WENT WRONG!
-				std::cout << "??"; 
+				std::cout << char(177) << char(177);
+			}else{ //Empty space
+				std::cout << "  "; 
 			}	
 		}
 		//Right Border
-		std::cout << "[]" << std::endl;
+		//std::cout << "[]" << std::endl;
+		std::cout << char(219) << char(219) << std::endl;
 	}
 	//Bottom Border
 	for(int b=0; b<tiles[0].size()+2; b++){
-		std::cout << "[]";
+		//std::cout << "[]";
+		std::cout << char(219) << char(219);
 	}
 	std::cout << std::endl << std::endl;
 	
@@ -272,7 +273,6 @@ void startingScreen(){
 	std::cout << centerString("By:",46+leftBorder*2) << std::endl;
 	std::cout << centerString("D'Metri Cortez",46+leftBorder*2) << std::endl;
 	std::cout << centerString("Jacob Shannon",46+leftBorder*2) << std::endl;
-	std::cout << centerString("Brittany Green",46+leftBorder*2) << std::endl;
 	std::cout << std::endl << std::endl;
 	std::cout << centerString("Press [Enter] to start.",46+leftBorder*2) << std::endl;
 
@@ -308,14 +308,27 @@ void randomFoodGenerator(){
 
 //Generates a random position for the snake head within the map. Avoid making it to close to the border.
 void randomHeadGenerator(){
-	// ???
-	headYPos = 4;
-	headXPos = 4;
+	headXPos = 1+(rand() % ((tiles.size()-1)-2 + 1));
+	headYPos = 1+(rand() % ((tiles[0].size()-1)-2 + 1));
 };
 
 //Generates a random direction number and sets the moveDirection variable to the new number.
 void randomDirectionGenerator(){
-	// ???
+	int dirInt = rand() % 4;
+	switch(dirInt){
+		case 0:
+			dir = UP;
+			break;
+		case 1:
+			dir = DOWN;
+			break;
+		case 2:
+			dir = LEFT;
+			break;
+		case 3:
+			dir = RIGHT;
+			break;
+	}
 };
 
 //Game over screen that displays the user's score and the high score. Allows for the option to replay. 
@@ -361,22 +374,23 @@ int main(){
 		randomDirectionGenerator();
 		randomFoodGenerator();
 		while(gameOver == false){ //Keep looping this until the game is over / player loses.
-			frame++;
+			//frame++;
 			updateTail();
 			displayMap();
 			input();
 			logic();
 			Sleep(80); //Pause the program for a fraction of a second to prevent the game from running too fast.
-			if(headXPos < 0 || headYPos < 0 || headYPos >= tiles[0].size() || headXPos >= tiles.size()){ //Head hit a wall.
-				gameOver = true;
-			}
+			
 			if(headXPos == foodXPos && headYPos == foodYPos){ //Head hit some food. 
 				score++;
 				randomFoodGenerator();
-			}
-			for(int i=0; i<tailCords.size(); i++){ //Go though the tailCords vector
-				if(tailCords[i][0] == headXPos && tailCords[i][1] == headYPos){ //Check to see if the head position is on a the current tail position being checked.
-					gameOver = true;
+			}else if(headXPos < 0 || headYPos < 0 || headYPos >= tiles[0].size() || headXPos >= tiles.size()){ //Head hit a wall.
+				gameOver = true;
+			}else{
+				for(int i=0; i<tailCords.size(); i++){ //Go though the tailCords vector
+					if(tailCords[i][0] == headXPos && tailCords[i][1] == headYPos){ //Check to see if the head position is on a the current tail position being checked.
+						gameOver = true;
+					}
 				}
 			}
 		}
